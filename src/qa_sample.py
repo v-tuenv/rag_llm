@@ -45,7 +45,7 @@ parser.add_argument(
     type=str,
     default="Qwen/Qwen1.5-4B",
     help="Provide folder contatin model generation from step train_text_generation",
-    required=True
+    required=False
 )
 
 if __name__ == '__main__':
