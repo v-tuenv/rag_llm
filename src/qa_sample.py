@@ -2,7 +2,7 @@ from langchain.document_loaders import HuggingFaceDatasetLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
-from transformers import AutoTokenizer, AutoModelForQuestionAnswering
+from transformers import AutoTokenizer, AutoModelForQuestionAnswering, AutoModelForCausalLM
 from transformers import AutoTokenizer, pipeline
 from langchain import HuggingFacePipeline
 from langchain.chains import RetrievalQA
@@ -12,6 +12,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from peft import AutoPeftModelForCausalLM
 
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
@@ -84,14 +85,25 @@ if __name__ == '__main__':
     # Load the tokenizer associated with the specified model
     tokenizer = AutoTokenizer.from_pretrained(model_name,trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token   
+    try:
+        model = AutoPeftModelForCausalLM.from_pretrained(
+            model_name, torch_dtype=torch.float16, trust_remote_code=True, device_map="auto"
+        )
+    except:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name, torch_dtype=torch.float16, trust_remote_code=True, device_map="auto"
+        )
+    
+
+    model = model.to("cuda")
+
     # Define a question-answering pipeline using the model and tokenizer
     question_answerer = pipeline(
-        model=model_name, 
+      "text-generation",
+        model=model, 
         tokenizer=tokenizer,
         return_tensors='pt',
-        torch_dtype=torch.float16,
         max_new_tokens=512,
-        device='cuda',
     )
 
     # Create an instance of the HuggingFacePipeline, which wraps the question-answering pipeline
@@ -117,7 +129,7 @@ if __name__ == '__main__':
         question = input("Provide question to model provide 'STOP' if you don't want predict: question: ")
         if question=="STOP":
             print("You provide stop ->> done exit program")
-
+            exit(0)
         answer = rag_chain.invoke(question)
         print(f'\nquestion={question}\nanswer={answer}\n')
         
