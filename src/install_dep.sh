@@ -6,4 +6,6 @@ pip install lmqg
 pip install -q sentence-transformers
 pip install -q faiss-cpu
 pip install -q langchain
+python3 -m spacy download en_core_web_sm
+
 

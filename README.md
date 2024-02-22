@@ -45,8 +45,7 @@ Here I simple use small model to generate. In the real-life, you should prepare 
 
 folder-text-file: folder dirs contain many .txt files.
 
-python3 src/generate_dataset.py --folder-text-file /content/drive/MyDrive/rag_project/datasets \
-                                --output-csv=data.csv
+python3 src/generate_dataset.py --folder-text-file datasets/ --output-csv=datasets/data.csv
 
 
 
@@ -57,7 +56,7 @@ note that if dataset is large must be increase lora-r and lora-alpha
 
 I just simple demo train-text-generation. 
 
-python3 src/train_text_generation.py --csv-path data.csv \
+python3 src/train_text_generation.py --csv-path datasets/data.csv \
         --output-folder ./log_run_20_2_2024 \
         --model-name="Qwen/Qwen1.5-4B" \
         --lora-r=8 --lora-alpha=16\
@@ -69,7 +68,7 @@ python3 src/train_text_generation.py --csv-path data.csv \
 ## Chatbot iteractive 
 
 python3 src/qa_sample.py --model-path-or-name=./log_run_20_2_2024/model_lora \
-                      --folder-text-file=/content/drive/MyDrive/rag_project/datasets
+                      --folder-text-file=datasets
 
 
 ![](images/screen.png)
@@ -86,5 +85,5 @@ https://colab.research.google.com/drive/15asWuPSfaorRYg6QtOvAXbKihsFULgTV?usp=sh
 
 For zero short learning, you should ignore step 1 and 2.
 
-python3 src/qa_sample.py --folder-text-file=/content/drive/MyDrive/rag_project/datasets
+python3 src/qa_sample.py --folder-text-file=/datasets
 
